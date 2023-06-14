@@ -1,96 +1,36 @@
-const readXlsxFile = require("read-excel-file/node");
-const Papa = require("papaparse");
-const moment = require("moment");
-const fs = require("fs");
-const path = require("path");
-const { program } = require("commander");
-const glob = require("glob");
-
-program
-  .option("-i, --input <string>")
-  .option("-o, --output <string>");
-
-program.parse();
-
-const options = program.opts();
-const { input, output } = options;
-
-const inputFolderPath = path.resolve(__dirname, input);
-const outputFolderPath = path.resolve(__dirname, output);
-
-const convertXlsxToCsv = (xlsxFilePath) => {
-  return new Promise((resolve, reject) => {
-    readXlsxFile(xlsxFilePath)
-      .then((rows) => {
-        const newFile = rows
-          .map((row, index) => {
-            if (index === 0) return row;
-
-            let [dob] = row.slice(-1);
-            if (dob) {
-              const rowDob = row.pop();
-              const date = moment(rowDob).format("L");
-              const [day, month, year] = date.split("/");
-              const formattedYear =
-                year.length === 2
-                  ? parseInt(year) > parseInt(moment().format("YY")) - 18
-                    ? "19" + year
-                    : "20" + year
-                  : year;
-
-              const formattedDate = `${day}/${month}/${formattedYear}`;
-              return [...row, formattedDate];
-            }
-            return row;
-          })
-          .filter((i) => i);
-
-        const jsonFile = JSON.stringify(newFile);
-        const csvFile = Papa.unparse(jsonFile);
-
-        const xlsxFileName = path.basename(xlsxFilePath, ".xlsx");
-        const csvFilePath = path.join(outputFolderPath, `${xlsxFileName}.csv`);
-
-        fs.writeFile(csvFilePath, csvFile, "utf8", (error) => {
-          if (error) {
-            reject(`Error writing CSV file: ${error}`);
-          } else {
-            const rowsCount = rows.length - 1;
-            resolve({ xlsxFilePath, csvFilePath, rowsCount });
-          }
-        });
-      })
-      .catch((error) => {
-        reject(`Error reading Excel file: ${error}`);
-      });
-  });
-};
-
-const convertXlsxFilesInFolder = (folderPath) => {
-  const xlsxFilesPattern = path.join(folderPath, "*.xlsx");
-  glob(xlsxFilesPattern, (error, xlsxFiles) => {
-    if (error) {
-      console.error("Error finding XLSX files:", error);
-      process.exit(1);
+"use strict";
+exports.__esModule = true;
+var express = require('express');
+var fileUpload = require('express-fileupload');
+var execSync = require('child_process').execSync;
+var app = express();
+app.use(fileUpload());
+app.post('/convert-api', function (req, res) {
+    if (!req.files || !req.files.file) {
+        return res.status(400).send('No file uploaded');
     }
-    const convertPromises = xlsxFiles.map((xlsxFilePath) =>
-      convertXlsxToCsv(xlsxFilePath)
-    );
-    Promise.all(convertPromises)
-      .then((results) => {
-        console.log("Conversion completed successfully!");
-        results.forEach(({ xlsxFilePath, csvFilePath, rowsCount }) => {
-          console.log({
-            xlsxFilePath,
-            csvFilePath,
-            rowsCount,
-          });
-        });
-      })
-      .catch((error) => {
-        console.error("An error occurred during conversion:", error);
-      });
-  });
-};
-
-convertXlsxFilesInFolder(inputFolderPath);
+    var file = req.files.file;
+    if (Array.isArray(file)) {
+        // Handle the case when file is an array of files
+        return res.status(400).send('Multiple files uploaded. Only one file is allowed.');
+    }
+    var filePath = "".concat(__dirname, "/files/").concat(file.name);
+    file.mv(filePath, function (error) {
+        if (error) {
+            console.error('Error saving file:', error);
+            return res.status(500).send('Error saving file');
+        }
+        try {
+            execSync("node convert-api.js -i \"".concat(filePath, "\" -o \"").concat(__dirname, "/files/\""), { stdio: 'inherit' });
+            var outputFilePath = "".concat(__dirname, "/files/").concat(file.name.replace('.xlsx', '.csv'));
+            return res.json({ success: true, outputFilePath: outputFilePath });
+        }
+        catch (error) {
+            console.error('Error converting file:', error);
+            return res.status(500).send('Error converting file');
+        }
+    });
+});
+app.listen(3000, function () {
+    console.log('Server is running on port 3000');
+});

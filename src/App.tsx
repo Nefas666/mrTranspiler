@@ -1,17 +1,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Stack, Button, Typography, Container, FilledInput } from '@mui/material';
-
-// import convert from '../api/convert'
-
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-
-
-
 import axios from 'axios';
+import '@fontsource/roboto/400.css';
+
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);

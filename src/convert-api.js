@@ -1,10 +1,13 @@
+const express = require("express");
 const readXlsxFile = require("read-excel-file/node");
 const Papa = require("papaparse");
 const moment = require("moment");
 const fs = require("fs");
 const path = require("path");
 const { program } = require("commander");
-const glob = require("glob");
+const fg = require('fast-glob');
+
+
 
 program
   .option("-i, --input <string>")
@@ -16,7 +19,7 @@ const options = program.opts();
 const { input, output } = options;
 
 const inputFolderPath = path.resolve(__dirname, input);
-const outputFolderPath = path.resolve(__dirname, output);
+const outputFolderPath = path.resolve(__dirname, '..', output);
 
 const convertXlsxToCsv = (xlsxFilePath) => {
   return new Promise((resolve, reject) => {
@@ -49,7 +52,8 @@ const convertXlsxToCsv = (xlsxFilePath) => {
         const csvFile = Papa.unparse(jsonFile);
 
         const xlsxFileName = path.basename(xlsxFilePath, ".xlsx");
-        const csvFilePath = path.join(outputFolderPath, `${xlsxFileName}.csv`);
+        const csvFileName = `${xlsxFileName}.csv`;
+        const csvFilePath = path.resolve(outputFolderPath, csvFileName);
 
         fs.writeFile(csvFilePath, csvFile, "utf8", (error) => {
           if (error) {
@@ -66,31 +70,28 @@ const convertXlsxToCsv = (xlsxFilePath) => {
   });
 };
 
-const convertXlsxFilesInFolder = (folderPath) => {
-  const xlsxFilesPattern = path.join(folderPath, "*.xlsx");
-  glob(xlsxFilesPattern, (error, xlsxFiles) => {
-    if (error) {
-      console.error("Error finding XLSX files:", error);
-      process.exit(1);
-    }
+const convertXlsxFilesInFolder = async (folderPath) => {
+  const xlsxFilesPattern = path.join(folderPath, '*.xlsx');
+  try {
+    const xlsxFiles = await fg(xlsxFilesPattern);
+
     const convertPromises = xlsxFiles.map((xlsxFilePath) =>
       convertXlsxToCsv(xlsxFilePath)
     );
-    Promise.all(convertPromises)
-      .then((results) => {
-        console.log("Conversion completed successfully!");
-        results.forEach(({ xlsxFilePath, csvFilePath, rowsCount }) => {
-          console.log({
-            xlsxFilePath,
-            csvFilePath,
-            rowsCount,
-          });
-        });
-      })
-      .catch((error) => {
-        console.error("An error occurred during conversion:", error);
+
+    const results = await Promise.all(convertPromises);
+    console.log('Conversion completed successfully!');
+    results.forEach(({ xlsxFilePath, csvFilePath, rowsCount }) => {
+      console.log({
+        xlsxFilePath,
+        csvFilePath,
+        rowsCount,
       });
-  });
+    });
+  } catch (error) {
+    console.error('An error occurred during conversion:', error);
+  }
 };
 
 convertXlsxFilesInFolder(inputFolderPath);
+
