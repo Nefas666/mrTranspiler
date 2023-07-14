@@ -1,36 +1,62 @@
-"use strict";
-exports.__esModule = true;
-var express = require('express');
-var fileUpload = require('express-fileupload');
-var execSync = require('child_process').execSync;
-var app = express();
-app.use(fileUpload());
-app.post('/convert-api', function (req, res) {
-    if (!req.files || !req.files.file) {
-        return res.status(400).send('No file uploaded');
-    }
-    var file = req.files.file;
-    if (Array.isArray(file)) {
-        // Handle the case when file is an array of files
-        return res.status(400).send('Multiple files uploaded. Only one file is allowed.');
-    }
-    var filePath = "".concat(__dirname, "/files/").concat(file.name);
-    file.mv(filePath, function (error) {
-        if (error) {
-            console.error('Error saving file:', error);
-            return res.status(500).send('Error saving file');
-        }
-        try {
-            execSync("node convert-api.js -i \"".concat(filePath, "\" -o \"").concat(__dirname, "/files/\""), { stdio: 'inherit' });
-            var outputFilePath = "".concat(__dirname, "/files/").concat(file.name.replace('.xlsx', '.csv'));
-            return res.json({ success: true, outputFilePath: outputFilePath });
-        }
-        catch (error) {
-            console.error('Error converting file:', error);
-            return res.status(500).send('Error converting file');
-        }
+const { ipcRenderer } = require("electron");
+const path = require("path");
+const Swal = require("sweetalert2");
+const Spinner = require("./spinner");
+const FileConverter = require("./FileParser");
+
+const spinnerContainer = document.getElementById("spinner-container");
+const spinner = new Spinner(spinnerContainer);
+
+const handleFileDrop = (file, outputFolderPath) => {
+  spinner.start();
+
+  const xlsxFilePath = file.path;
+  const converter = new FileConverter();
+
+  converter
+    .convertToCsv(xlsxFilePath, outputFolderPath)
+    .then(({ xlsxFilePath, csvFilePath, rowsCount }) => {
+      console.log({
+        xlsxFilePath,
+        csvFilePath,
+        rowsCount,
+      });
+
+      Swal.fire({
+        title: "<b>File convertito con successo!</b>",
+        icon: "success",
+        html: `<p>Il percorso del file caricato è:<br><a href="file://${xlsxFilePath}">${xlsxFilePath}</a></p><p>Il percorso al file convertito in CSV è:<br><a href="file://${csvFilePath}">${csvFilePath}</a></p><p>Il numero delle righe all'interno del file – intestazione esclusa – è di:<br><b>${rowsCount}</b></p>`,
+        showCloseButton: true,
+      });
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = `file://${csvFilePath}`;
+      downloadLink.download = path.basename(csvFilePath);
+      downloadLink.click();
+    })
+    .catch((error) => {
+      console.error("An error occurred during conversion:", error);
+    })
+    .finally(() => {
+      spinner.stop();
     });
+};
+
+document.querySelector(".drop-zone").addEventListener("drop", (event) => {
+  event.preventDefault();
+  const files = event.dataTransfer.files;
+
+  ipcRenderer.send("getDownloadsPath");
+  ipcRenderer.once("downloadsPath", (event, downloadsPath) => {
+    const outputFolderPath = path.resolve(downloadsPath, "output");
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      handleFileDrop(file, outputFolderPath);
+    }
+  });
 });
-app.listen(3000, function () {
-    console.log('Server is running on port 3000');
+
+document.querySelector(".drop-zone").addEventListener("dragover", (event) => {
+  event.preventDefault();
 });

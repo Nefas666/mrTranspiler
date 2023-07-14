@@ -1,25 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,Arial, sans-serif; */
+  font-family: 'Outfit', sans-serif;
+  /* background-image: linear-gradient(102.7deg, rgba(253, 218, 255, 1) 8.2%, rgba(223, 173, 252, 1) 19.6%, rgba(173, 205, 252, 1) 36.8%, rgba(173, 252, 244, 1) 73.2%, rgba(202, 248, 208, 1) 90.9%);*/
+  background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.dev/svgjs' viewBox='0 0 800 800'%3E%3Cdefs%3E%3Cfilter id='bbblurry-filter' x='-100%25' y='-100%25' width='400%25' height='400%25' filterUnits='objectBoundingBox' primitiveUnits='userSpaceOnUse' color-interpolation-filters='sRGB'%3E%3CfeGaussianBlur stdDeviation='48' x='0%25' y='0%25' width='100%25' height='100%25' in='SourceGraphic' edgeMode='none' result='blur'%3E%3C/feGaussianBlur%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23bbblurry-filter)'%3E%3Cellipse rx='150' ry='150' cx='279.0874611662674' cy='291.2625975653272' fill='hsla(90, 69%25, 72%25, 1.00)'%3E%3C/ellipse%3E%3Cellipse rx='150' ry='150' cx='298.0707795315035' cy='346.7048975466275' fill='hsla(272, 99%25, 54%25, 0.48)'%3E%3C/ellipse%3E%3Cellipse rx='150' ry='150' cx='436.03848669609914' cy='541.053138303311' fill='hsla(212, 57%25, 42%25, 1.00)'%3E%3C/ellipse%3E%3Cellipse rx='150' ry='150' cx='480.6140107958729' cy='313.3906816412641' fill='hsla(176, 37%25, 70%25, 1.00)'%3E%3C/ellipse%3E%3C/g%3E%3C/svg%3E");  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover; 
+  /*background-color: hsl(0 0% 5%);*/
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  height: 100vh;
+  overflow: hidden;
+  margin: auto;
 }
-  
-  body {
-     background-image: linear-gradient( 102.7deg, rgba(253,218,255,1) 8.2%, rgba(223,173,252,1) 19.6%, rgba(173,205,252,1) 36.8%, rgba(173,252,244,1) 73.2%, rgba(202,248,208,1) 90.9% );
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-size: cover;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    height: 100vh;
-    overflow: hidden;
-  }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.title{
+  font-size:2rem;
+}
+
+.drop-zone {
+  width: 400px;
+  height: 400px;
+  background-color: hsl(0, 0%, 100%);
+  background-image: url("data:image/svg+xml,%3Csvg width='1026' height='799' viewBox='0 0 1026 799' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1025.6 427.234C1025.6 559.243 918.219 666.668 786.259 666.668H706.926C693.349 666.668 682.24 655.668 682.24 641.973C682.24 628.278 693.237 617.277 706.926 617.277H786.259C891.064 617.277 976.344 531.965 976.344 427.121C976.344 322.277 891.064 236.965 786.259 236.965C783.678 236.965 781.097 237.078 778.517 237.19C768.193 237.863 758.88 231.689 754.84 222.26C710.18 117.079 607.508 49.1666 493.39 49.1666C352.79 49.1666 231.827 154.011 212.19 293.204C210.619 304.654 201.193 313.522 189.636 314.307C110.976 320.145 49.3726 386.598 49.3726 465.624C49.3726 549.252 117.372 617.389 201.081 617.389H318.79C332.368 617.389 343.476 628.39 343.476 642.085C343.476 655.78 332.48 666.781 318.79 666.781H200.969C90.105 666.781 0 576.53 0 465.736C0 367.627 71.7025 284.111 166.52 267.61C197.378 113.712 334.612 0 493.277 0C621.758 0 737.672 73.301 793.216 188.023C922.034 191.615 1025.6 297.582 1025.6 427.234ZM680.669 525.23L530.195 374.812C520.545 365.158 504.947 365.158 495.297 374.812L344.935 525.23C335.285 534.884 335.285 550.487 344.935 560.141C349.76 564.968 356.044 567.325 362.328 567.325C368.612 567.325 374.895 564.968 379.72 560.141L487.779 452.041L488.228 774.094C488.228 787.677 499.225 798.678 512.914 798.678C526.492 798.678 537.601 787.564 537.488 773.982L537.04 451.48L645.659 560.141C655.309 569.794 670.907 569.794 680.557 560.141C690.319 550.487 690.319 534.884 680.669 525.23Z' fill='black'/%3E%3C/svg%3E%0A");
+  background-repeat: no-repeat;
+  background-size: 100px; 
+  background-position: center;
+  /* //border: 10px dashed #ccc; */
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius:2rem;
+}
+
+.drop-zone > p{
+  margin-top: 2rem;
+}
+#spinner-container {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
