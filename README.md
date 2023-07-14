@@ -20,7 +20,7 @@ For more information about Electron usage see the official documentation [here](
 ## Getting started
 Clone the repository
 ```
-git clone 
+git clone https://github.com/Nefas666/mrTranspiler.git
 ```
 Install all dependencies
 ```
