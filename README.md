@@ -1,8 +1,8 @@
 
-# XLSX TO CSV Parser – Parse and convert your Excel files into .CSV's
+# mrTranspiler – Parse and convert your Excel files into .CSV's
 
 
-XLSX TO CSV Parser is an **Electron application** that provides conversion and parsing functionalities to transform an Excel .xlsx file into a .csv file. It allows you to parse files and perform date fetching and string parsing operations on the data contained in them.
+mrTranspiler is an **Electron application** that provides conversion and parsing functionalities to transform an Excel .xlsx file into a .csv file. It allows you to parse files and perform date fetching and string parsing operations on the data contained in them.
 
 For more information about Electron usage see the official documentation [here](https://www.electronjs.org/docs/latest/).
 
